@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+#PySlices Save Format Version 1.2 (PySlices v0.9.8 and later)
+#PySlices Marker Information -- Begin Grouping Slice
+#PySlices Marker Information -- Begin Output Slice
+#PySlices 0.9.8 - The Flakiest Python Shell... Cut up!
+#Python 2.7.1 (r271:86832, Nov 27 2010, 18:30:46) [MSC v.1500 32 bit (Intel)] on win32
+#Type "help", "copyright", "credits" or "license" for more information.
+#PySlices Marker Information -- Begin Grouping Slice
+#PySlices Marker Information -- Begin Input Slice
+import wx
+
+class MyFrame(wx.Frame):
+    def __init__(self):
+        super(MyFrame, self).__init__(None, title="Anki reps import/export")
+        self.panel = wx.Panel(self)
+        self.Show(True)
+
+app = wx.App()
+frame = MyFrame()
+app.MainLoop()
+#PySlices Marker Information -- Begin Output Slice
+#
+#PySlices Marker Information -- Begin Output Slice
+#
