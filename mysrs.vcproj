@@ -57,7 +57,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES)"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
+				AdditionalIncludeDirectories="$(IntDir);include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -147,7 +147,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES)"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
+				AdditionalIncludeDirectories="$(IntDir);include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -209,6 +209,10 @@
 			>
 			<File
 				RelativePath=".\src\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mysrs.rc"
 				>
 			</File>
 		</Filter>
