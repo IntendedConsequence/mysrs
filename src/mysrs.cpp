@@ -95,28 +95,6 @@ MyFrame::MyFrame(const wxString& title)
 
 	LoadRepsTodo();
 
-
-
-	//load failed reps
-	//wxTextFile failfile(m_failed_file);
-	//if(failfile.Exists()) {
-	//	failfile.Open(m_failed_file);
-	//	for(s = failfile.GetFirstLine(); !failfile.Eof(); s = failfile.GetNextLine()) {
-	//		_id = s.BeforeFirst('\t');
-	//		s = s.AfterFirst('\t');
-	//		_kanji = s.BeforeFirst('\t');
-	//		s = s.AfterFirst('\t');
-	//		_keyword = s.BeforeFirst('\t');
-	//		s = s.AfterFirst('\t');
-	//		_story = s;
-
-	//		Card *c = new Card(_id, _kanji, _keyword, _story);
-	//		m_reps_failed.push(c);
-	//	}
-
-	//	failfile.Close();
-	//}
-
 	if(m_cards.size() == 0) {
 		m_cards.push_back(new Card(L"0", L"x", L"there is nothing to review!", L"the repstodo.txt file is empty"));
 	}
@@ -124,6 +102,7 @@ MyFrame::MyFrame(const wxString& title)
 
 	panel = new wxPanel(this);
 	vbox = new wxBoxSizer(wxVERTICAL);
+
 	//this is a trick to make menu events handling work
 	//we create a dummy button with an id, but we don't show it
 	//then we have a menu item with the same id that does show up
@@ -219,15 +198,9 @@ MyFrame::MyFrame(const wxString& title)
 
 	// ... and attach this menu bar to the frame
 	SetMenuBar(menuBar);
-	//menuBar->Show(true);
 
 
 
-#if 0
-	// create a status bar just for fun (by default with 1 pane only)
-	CreateStatusBar(2);
-	SetStatusText(_T("Welcome to wxWidgets!"));
-#endif // wxUSE_STATUSBAR
 }
 
 void MyFrame::LoadRepsTodo() {
@@ -260,23 +233,7 @@ void MyFrame::LoadRepsTodo() {
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
-
-	//wxFile file;
-	//file.Open(m_output_file, wxFile::read_write); //first dump all done reps
-	//file.SeekEnd();
-	//wxString line;
-	//wxString t = wxS('\t');
-	//wxString n = wxS('\n');
-	//Card *c = NULL;
-	//while(m_reps_done.size() > 0) {
-	//	c = m_reps_done.front();
-	//	line = c->GetId() + t + c->GetEase() + n;
-	//	file.Write(line);
-	//	m_reps_done.pop();
-	//}
-	//file.Close();
-
-	//the new version of done reps
+	//dump all done reps
 	wxFile file;
 	file.Open(m_output_file, wxFile::read_write);
 	file.SeekEnd();
@@ -302,17 +259,7 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 		m_reps_todo.pop();
 	}
 	file.Close();
-	//////////////////////////////////////////////////////////////////////////
-	//file.Create(m_failed_file, true); //then dump all failed reps
-	//while(m_reps_failed.size() > 0) {
-	//	c = m_reps_failed.front();
-	//	line = c->GetId() + t + c->GetKanji() + t + c->GetKeyword() + t + c->GetStory() + n;
-	//	file.Write(line);
-	//	m_reps_failed.pop();
-	//}
-	//file.Close();
 
-	// true is to force the frame to close
 	Close(true);
 }
 
@@ -332,11 +279,7 @@ void MyFrame::OnShowStory(wxCommandEvent& WXUNUSED(event)) {
 	static bool on = false;
 	on ? story->Show(false) : story->Show(true);
 	on = !on;
-	//hbox->Fit(panel);
-	//panel->SetAutoLayout(true);
-	//hbox->Fit(panel);
-	//hbox2->Fit(panel);
-	//vbox->Fit(panel);
+
 	hbox2->Layout();
 	vbox->Layout();
 }
@@ -348,7 +291,6 @@ void MyFrame::OnShowAnswer(wxCommandEvent& WXUNUSED(event)) {
 	ison = !ison;
 	hbox->Layout();
 	vbox->Layout();
-	//vbox->Fit(panel);
 }
 
 void MyFrame::AnswerCard(int ease) {
@@ -373,8 +315,6 @@ void MyFrame::AnswerCard(int ease) {
 	m_reps_todo.pop();
 
 	c->SetEase(txt);
-
-	//m_reps_done.push(c);
 
 	answer_result res;
 	res.id = c->GetId();
