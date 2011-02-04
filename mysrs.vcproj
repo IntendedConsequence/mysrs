@@ -208,6 +208,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\src\MyFrame.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\mysrs.cpp"
 				>
 			</File>
@@ -223,6 +227,10 @@
 			>
 			<File
 				RelativePath=".\src\Card.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MyFrame.h"
 				>
 			</File>
 			<File
