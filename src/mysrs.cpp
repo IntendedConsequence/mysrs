@@ -5,10 +5,10 @@
 #include "wx/dir.h"
 #include "wx/textfile.h"
 
-#include <vector>
-#include <queue>
+
 
 #include "Card.h"
+#include "mysrs.h"
 
 class MyApp : public wxApp
 {
@@ -17,54 +17,9 @@ public:
 };
 
 
-struct answer_result {
-	wxString id;
-	wxString ease;
-};
 
-// Define a new frame type: this is going to be our main frame
-class MyFrame : public wxFrame
-{
-public:
-	// ctor(s)
-	MyFrame(const wxString& title);
-	virtual ~MyFrame() {
-		for(int i = 0; i < m_cards.size(); i++) {
-			delete m_cards[i];
-		}
-		m_cards.clear();
 
-	}
 
-	void LoadRepsTodo();
-
-	void OnQuit(wxCommandEvent& event);
-	void OnAbout(wxCommandEvent& event);
-	void OnShowStory(wxCommandEvent& event);
-	void OnShowAnswer(wxCommandEvent& event);
-	void OnFail(wxCommandEvent& event);
-	void OnHard(wxCommandEvent& event);
-	void OnGood(wxCommandEvent& event);
-	void OnEasy(wxCommandEvent& event);
-	void AnswerCard(int ease);
-
-private:
-	std::vector<Card *> m_cards;
-
-	wxString m_input_file; //reps todo
-	wxString m_output_file; //reps done
-
-	std::queue<Card *> m_reps_todo;
-	std::queue<answer_result> m_reps_done;
-
-	wxStaticText *kanji;
-	wxStaticText *keyword;
-	wxTextCtrl *story;
-	wxBoxSizer *vbox;
-	wxBoxSizer *hbox;
-	wxBoxSizer *hbox2;
-	wxPanel *panel;
-};
 IMPLEMENT_APP(MyApp)
 
 // 'Main program' equivalent: the program execution "starts" here
@@ -95,31 +50,29 @@ MyFrame::MyFrame(const wxString& title)
 
 	LoadRepsTodo();
 
-	if(m_cards.size() == 0) {
-		m_cards.push_back(new Card(L"0", L"x", L"there is nothing to review!", L"the repstodo.txt file is empty"));
-	}
+	
 
 
-	panel = new wxPanel(this);
-	vbox = new wxBoxSizer(wxVERTICAL);
+	m_panel = new wxPanel(this);
+	m_vbox = new wxBoxSizer(wxVERTICAL);
 
 	//this is a trick to make menu events handling work
 	//we create a dummy button with an id, but we don't show it
 	//then we have a menu item with the same id that does show up
 	//and somehow it works ^_^
-	wxButton *button_exit = new wxButton(panel, wxID_EXIT);
+	wxButton *button_exit = new wxButton(m_panel, wxID_EXIT);
 	button_exit->Show(false);
 	Connect(wxID_EXIT, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnQuit));
 
-	wxButton *button_about = new wxButton(panel, wxID_ABOUT);
+	wxButton *button_about = new wxButton(m_panel, wxID_ABOUT);
 	button_about->Show(false);
 	Connect(wxID_ABOUT, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnAbout));
 
 	wxWindowID show_story_button_id = wxNewId();
-	wxButton *button_show_story = new wxButton(panel, show_story_button_id, _T("Show Story"));
+	wxButton *button_show_story = new wxButton(m_panel, show_story_button_id, _T("Show Story"));
 	Connect(show_story_button_id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnShowStory));
 	wxWindowID show_answer_button_id = wxNewId();
-	wxButton *button_show_answer = new wxButton(panel, show_answer_button_id, _T("Show Answer"));
+	wxButton *button_show_answer = new wxButton(m_panel, show_answer_button_id, _T("Show Answer"));
 	Connect(show_answer_button_id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnShowAnswer));
 	wxSize answer_buttons_size(40,-1);
 
@@ -127,53 +80,53 @@ MyFrame::MyFrame(const wxString& title)
 	wxWindowID button_hard_id = wxNewId();
 	wxWindowID button_good_id = wxNewId();
 	wxWindowID button_easy_id = wxNewId();
-	wxButton *button_answer_fail = new wxButton(panel, button_fail_id, _T("Bad"), wxDefaultPosition, answer_buttons_size);
-	wxButton *button_answer_hard = new wxButton(panel, button_hard_id, _T("Hard"), wxDefaultPosition, answer_buttons_size);
-	wxButton *button_answer_good = new wxButton(panel, button_good_id, _T("Good"), wxDefaultPosition, answer_buttons_size);
-	wxButton *button_answer_easy = new wxButton(panel, button_easy_id, _T("Easy"), wxDefaultPosition, answer_buttons_size);
+	wxButton *button_answer_fail = new wxButton(m_panel, button_fail_id, _T("Bad"), wxDefaultPosition, answer_buttons_size);
+	wxButton *button_answer_hard = new wxButton(m_panel, button_hard_id, _T("Hard"), wxDefaultPosition, answer_buttons_size);
+	wxButton *button_answer_good = new wxButton(m_panel, button_good_id, _T("Good"), wxDefaultPosition, answer_buttons_size);
+	wxButton *button_answer_easy = new wxButton(m_panel, button_easy_id, _T("Easy"), wxDefaultPosition, answer_buttons_size);
 
 	Connect(button_fail_id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnFail));
 	Connect(button_hard_id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnHard));
 	Connect(button_good_id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnGood));
 	Connect(button_easy_id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnEasy));
 
-	hbox = new wxBoxSizer(wxHORIZONTAL);
-	hbox->Add(button_answer_fail, 0, wxALIGN_CENTER_HORIZONTAL);
-	hbox->Add(button_answer_hard, 0, wxALIGN_CENTER_HORIZONTAL);
-	hbox->Add(button_answer_good, 0, wxALIGN_CENTER_HORIZONTAL);
-	hbox->Add(button_answer_easy, 0, wxALIGN_CENTER_HORIZONTAL);
-	hbox->Show(false);
+	m_hbox = new wxBoxSizer(wxHORIZONTAL);
+	m_hbox->Add(button_answer_fail, 0, wxALIGN_CENTER_HORIZONTAL);
+	m_hbox->Add(button_answer_hard, 0, wxALIGN_CENTER_HORIZONTAL);
+	m_hbox->Add(button_answer_good, 0, wxALIGN_CENTER_HORIZONTAL);
+	m_hbox->Add(button_answer_easy, 0, wxALIGN_CENTER_HORIZONTAL);
+	m_hbox->Show(false);
 	wxWindowID kanji_id = wxNewId();
 	wxWindowID story_id = wxNewId();
 
 
-	kanji = new wxStaticText(panel, kanji_id, m_cards[0]->GetKanji());
-	keyword = new wxStaticText(panel, wxID_ANY, m_cards[0]->GetKeyword());
-	keyword->Show(false);
+	m_kanji = new wxStaticText(m_panel, kanji_id, m_cards[0]->GetKanji());
+	m_keyword = new wxStaticText(m_panel, wxID_ANY, m_cards[0]->GetKeyword());
+	m_keyword->Show(false);
 	//story = new wxTextCtrl(panel, story_id, _T("\"The Pinnacle, to me, is a city that makes itself out to be perfect but is filled with dirty secrets that photographers are always trying to reveal (see dissolve (#1044) The city's councilmen have isolated all professional photographers to make sure they don't photograph these \"\"dirty secrets\"\". (which are up to your imagination).\""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-	story = new wxTextCtrl(panel, story_id, m_cards[0]->GetStory(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-	story->Show(false);
+	m_story = new wxTextCtrl(m_panel, story_id, m_cards[0]->GetStory(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+	m_story->Show(false);
 	//story->Wrap(100);
 	//vbox->Add(button_exit, 0, wxALIGN_LEFT | wxALIGN_TOP);
-	hbox2 = new wxBoxSizer(wxHORIZONTAL);
-	hbox2->Add(kanji);
-	hbox2->Add(story);
-	vbox->Add(hbox2, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_BOTTOM);
-	vbox->Add(button_show_story, 0, wxALIGN_CENTER_HORIZONTAL);
-	vbox->Add(button_show_answer, 0, wxALIGN_CENTER_HORIZONTAL);
-	vbox->AddStretchSpacer();
-	vbox->Add(keyword, 0, wxALIGN_CENTER_HORIZONTAL);
-	vbox->AddSpacer(4);
-	vbox->Add(hbox, 0, wxALIGN_CENTER_HORIZONTAL);
+	m_hbox2 = new wxBoxSizer(wxHORIZONTAL);
+	m_hbox2->Add(m_kanji);
+	m_hbox2->Add(m_story);
+	m_vbox->Add(m_hbox2, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_BOTTOM);
+	m_vbox->Add(button_show_story, 0, wxALIGN_CENTER_HORIZONTAL);
+	m_vbox->Add(button_show_answer, 0, wxALIGN_CENTER_HORIZONTAL);
+	m_vbox->AddStretchSpacer();
+	m_vbox->Add(m_keyword, 0, wxALIGN_CENTER_HORIZONTAL);
+	m_vbox->AddSpacer(4);
+	m_vbox->Add(m_hbox, 0, wxALIGN_CENTER_HORIZONTAL);
 	wxFont font = GetFont();
 	font.SetPointSize(100);
-	kanji->SetFont(font);
+	m_kanji->SetFont(font);
 	//kanji->SetPosition(wxPoint(20,20));
 
 	button_answer_hard->Show(false);
 
-	panel->SetSizer(vbox);
-	panel->SetAutoLayout(true);
+	m_panel->SetSizer(m_vbox);
+	m_panel->SetAutoLayout(true);
 	//vbox->Fit(panel);
 	//wxButton *button_about = new wxButton(panel, wxID_ABOUT, _T("About"), wxPoint(100,0));
 
@@ -226,6 +179,10 @@ void MyFrame::LoadRepsTodo() {
 
 		file.Close();
 	}
+
+	if(m_cards.size() == 0) {
+		m_cards.push_back(new Card(L"0", L"x", L"there is nothing to review!", L"the repstodo.txt file is empty"));
+	}
 }
 
 
@@ -277,20 +234,20 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 
 void MyFrame::OnShowStory(wxCommandEvent& WXUNUSED(event)) {
 	static bool on = false;
-	on ? story->Show(false) : story->Show(true);
+	on ? m_story->Show(false) : m_story->Show(true);
 	on = !on;
 
-	hbox2->Layout();
-	vbox->Layout();
+	m_hbox2->Layout();
+	m_vbox->Layout();
 }
 
 void MyFrame::OnShowAnswer(wxCommandEvent& WXUNUSED(event)) {
 	static bool ison = false;
-	hbox->Show(!ison);
-	keyword->Show(!ison);
+	m_hbox->Show(!ison);
+	m_keyword->Show(!ison);
 	ison = !ison;
-	hbox->Layout();
-	vbox->Layout();
+	m_hbox->Layout();
+	m_vbox->Layout();
 }
 
 void MyFrame::AnswerCard(int ease) {
@@ -326,16 +283,16 @@ void MyFrame::AnswerCard(int ease) {
 	}
 	if(m_reps_todo.size() > 0) {
 		c = m_reps_todo.front();
-		kanji->SetLabel(c->GetKanji());
-		story->SetLabel(c->GetStory());
-		keyword->SetLabel(c->GetKeyword());
+		m_kanji->SetLabel(c->GetKanji());
+		m_story->SetLabel(c->GetStory());
+		m_keyword->SetLabel(c->GetKeyword());
 	} else {
-		kanji->SetLabel(wxS("x"));
-		story->SetLabel(wxS("you have finished reviewing all cards!"));
-		keyword->SetLabel(wxS("no more cards to review"));
+		m_kanji->SetLabel(wxS("x"));
+		m_story->SetLabel(wxS("you have finished reviewing all cards!"));
+		m_keyword->SetLabel(wxS("no more cards to review"));
 	}
 
-	if(story->IsShown()) {
+	if(m_story->IsShown()) {
 		OnShowStory(wxCommandEvent());
 	}
 

@@ -225,6 +225,10 @@
 				RelativePath=".\src\Card.h"
 				>
 			</File>
+			<File
+				RelativePath=".\src\mysrs.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
