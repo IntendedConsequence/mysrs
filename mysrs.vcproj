@@ -101,7 +101,7 @@
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles="repstodo.txt|$(ProjectDir)|%CSIDL_PROGRAM_FILES%\mysrs\|0"
+				AdditionalFiles="repstodo.txt|$(ProjectDir)|%CSIDL_PROGRAM_FILES%\mysrs\|0;repsnew.txt|$(ProjectDir)|%CSIDL_PROGRAM_FILES%\mysrs\|0"
 			/>
 			<DebuggerTool
 			/>
@@ -193,7 +193,7 @@
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles="repstodo.txt|$(ProjectDir)|%CSIDL_PROGRAM_FILES%\mysrs\|0"
+				AdditionalFiles="repstodo.txt|$(ProjectDir)|%CSIDL_PROGRAM_FILES%\mysrs\|0;repsnew.txt|$(ProjectDir)|%CSIDL_PROGRAM_FILES%\mysrs\|0"
 			/>
 			<DebuggerTool
 			/>

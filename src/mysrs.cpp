@@ -23,11 +23,15 @@ bool MySRS::OnInit()
 	path = path.BeforeLast('\\');
 
 	m_input_file = path + wxS("\\repstodo.txt");
+	m_input_new_file = path + wxS("\\repsnew.txt");
 	m_output_file = path + wxS("\\repsdone.txt");
 
 	LoadRepsTodo();
+	
 
-	m_frame = new MyFrame(wxS("mysrs"), this);	
+	m_frame = new MyFrame(wxS("mysrs"), this);
+	
+	LoadRepsNew();
 
 	m_frame->Show(true);
 
@@ -71,6 +75,37 @@ void MySRS::LoadRepsTodo(){
 
 
 
+void MySRS::LoadRepsNew(){
+	wxTextFile file(m_input_new_file);
+	wxString s;
+	wxString _id, _kanji, _keyword, _story;
+	if(file.Exists()) {	
+		file.Open();
+
+		for(s = file.GetFirstLine(); !file.Eof(); s = file.GetNextLine()) {
+			_id = s.BeforeFirst('\t');
+			s = s.AfterFirst('\t');
+			_kanji = s.BeforeFirst('\t');
+			s = s.AfterFirst('\t');
+			_keyword = s.BeforeFirst('\t');
+			s = s.AfterFirst('\t');
+			_story = s;
+
+			Card *c = new Card(_id, _kanji, _keyword, _story);
+			//m_cards.push_back(c);
+			m_reps_new.push(c);
+		}
+
+		file.Close();
+	}
+
+	if(m_reps_new.size() == 0) {
+		//set new interface as no new cards
+	} else {
+		Card *c = m_reps_new.front();
+		m_frame->SetCurrentNewKanji(c->GetKanji(), c->GetStory(), c->GetKeyword());
+	}
+}
 void MySRS::DumpDoneReps() {
 	wxFile file;
 	file.Open(m_output_file, wxFile::read_write);
@@ -104,6 +139,22 @@ void MySRS::DumpTodoReps() {
 	file.Close();
 }
 
+void MySRS::DumpNewReps() {
+	wxFile file;
+	Card *c = NULL;
+	wxString line;
+	wxString t = wxS('\t');
+	wxString n = wxS('\n');
+	file.Create(m_input_new_file, true); //then dump all still new reps
+	while(m_reps_new.size() > 0) {
+		c = m_reps_new.front();
+		line = c->GetId() + t + c->GetKanji() + t + c->GetKeyword() + t + c->GetStory() + n;
+		file.Write(line);
+		m_reps_new.pop();
+	}
+	file.Close();
+}
+
 void MySRS::AnswerCard(int ease) {
 	wxString txt;
 	switch(ease) {
@@ -121,6 +172,7 @@ void MySRS::AnswerCard(int ease) {
 		break;
 	}
 
+	//**TODO**: add checks for m_reps_todo emptiness
 	Card *c = m_reps_todo.front();
 	m_reps_todo.pop();
 	c->SetEase(txt);
@@ -142,5 +194,30 @@ void MySRS::AnswerCard(int ease) {
 		m_frame->SetCurrentKanji(wxS("x"),
 			wxS("you have finished reviewing all cards!"),
 			wxS("no more cards to review"));
+	}
+}
+
+void MySRS::LearnedCard(){
+	if(m_reps_new.size() > 0) {
+		Card *c = m_reps_new.front();
+		m_reps_new.pop();
+		m_reps_todo.push(c);
+		
+		//if no reps are left...
+		if(m_reps_todo.size() == 1) { //show the learned kanji immediately
+			m_frame->SetCurrentKanji(c->GetKanji(), c->GetStory(), c->GetKeyword());
+		}
+
+		//if there are still new kanji to learn...
+		if(m_reps_new.size() > 0) {
+			c = m_reps_new.front();
+			m_frame->SetCurrentNewKanji(c->GetKanji(), c->GetStory(), c->GetKeyword());
+		} else {
+			m_frame->SetCurrentNewKanji(wxS("x"),
+				wxS("you have finished learning all new cards!"),
+				wxS("no more new cards to learn"));
+		}
+
+		
 	}
 }

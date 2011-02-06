@@ -24,11 +24,52 @@ MyFrame::MyFrame(const wxString& title, MySRS *app)
 	m_panel = new wxPanel(m_notebook, wxID_ANY);
 	m_notebook->AddPage(m_panel, wxS("kanji"));
 
+
 	m_panelStory1 = new wxPanel(m_notebook, wxID_ANY);
 	m_story1 = new wxStaticText(m_panelStory1, wxID_ANY, wxS("Story!"));
 
 	m_notebook->AddPage(m_panelStory1, wxS("story 1"));
-	m_notebook->AddPage(new wxPanel(m_notebook, wxID_ANY), wxS("story 2"));
+
+
+	m_panelStory2 = new wxPanel(m_notebook, wxID_ANY);
+	m_story2 = new wxStaticText(m_panelStory2, wxID_ANY, wxS("Story!"));
+
+	m_notebook->AddPage(m_panelStory2, wxS("story 2"));
+
+
+	m_panelNew = new wxPanel(m_notebook, wxID_ANY);
+	//////////////////////////////////////////////////////////////////////////
+	//the new kanji panel layout
+	m_new_vbox = new wxBoxSizer(wxVERTICAL);
+	m_new_vbox2 = new wxBoxSizer(wxVERTICAL);
+	m_new_hbox1 = new wxBoxSizer(wxHORIZONTAL);
+	m_new_hbox2 = new wxBoxSizer(wxHORIZONTAL);
+
+	m_new_kanji = new wxStaticText(m_panelNew, wxID_ANY, wxS("0"));
+	m_new_keyword = new wxStaticText(m_panelNew, wxID_ANY, wxS("zero"));
+	m_new_story1 = new wxTextCtrl(m_panelNew, wxID_ANY, wxS("blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah"), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+	m_new_story2 = new wxTextCtrl(m_panelNew, wxID_ANY, wxS("blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah"), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+
+	wxFont font_desu = GetFont();
+	font_desu.SetPointSize(100);
+	m_new_kanji->SetFont(font_desu);
+
+	wxWindowID button_learned_id = wxNewId();
+	wxButton *button_learned = new wxButton(m_panelNew, button_learned_id, wxS("Learned"));
+	Connect(button_learned_id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnLearned));
+
+	m_new_vbox2->Add(m_new_keyword, 0, wxALIGN_CENTER_HORIZONTAL);
+	m_new_vbox2->Add(m_new_story1, 1, wxEXPAND);
+	m_new_hbox1->Add(m_new_kanji);
+	m_new_hbox1->Add(m_new_vbox2, 1, wxEXPAND);
+	m_new_vbox->Add(m_new_hbox1, 0, wxALIGN_CENTER_HORIZONTAL);
+	m_new_vbox->Add(m_new_story2, 1, wxEXPAND);
+	m_new_vbox->Add(button_learned, 0, wxALIGN_CENTER_HORIZONTAL);
+
+	m_panelNew->SetSizer(m_new_vbox);
+	m_panelNew->SetAutoLayout(true);
+	//////////////////////////////////////////////////////////////////////////
+	m_notebook->AddPage(m_panelNew, wxS("new"));
 
 
 	m_vbox = new wxBoxSizer(wxVERTICAL);
@@ -141,6 +182,7 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
 	m_app->DumpDoneReps();
 	m_app->DumpTodoReps();
+	m_app->DumpNewReps();
 
 	Close(true);
 }
@@ -206,6 +248,10 @@ void MyFrame::AnswerCard(int ease) {
 	HideAnswer();
 }
 
+void MyFrame::OnLearned(wxCommandEvent& WXUNUSED(event)) {
+	m_app->LearnedCard();
+}
+
 void MyFrame::OnFail(wxCommandEvent& WXUNUSED(event)) {
 	AnswerCard(1);
 }
@@ -230,4 +276,11 @@ void MyFrame::SetCurrentKanji(wxString kanji, wxString story, wxString keyword) 
 	m_panelStory1->GetSize(&w, NULL);
 	m_story1->Wrap(w);
 	m_keyword->SetLabel(keyword);
+	m_vbox->Layout();
+}
+void MyFrame::SetCurrentNewKanji(wxString kanji, wxString story, wxString keyword) {
+	m_new_kanji->SetLabel(kanji);
+	m_new_story1->SetLabel(story);
+	m_new_keyword->SetLabel(keyword);
+	m_new_vbox->Layout();
 }
