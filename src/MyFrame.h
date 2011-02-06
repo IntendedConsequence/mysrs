@@ -32,6 +32,11 @@ public:
 	void LoadRepsTodo();
 	void SetCurrentKanji(wxString kanji, wxString story, wxString keyword);
 
+	void ShowStory();
+	void HideStory();
+	void ShowAnswer();
+	void HideAnswer();
+
 	void OnQuit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 	void OnShowStory(wxCommandEvent& event);

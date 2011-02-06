@@ -208,12 +208,38 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 		this);
 }
 
+void MyFrame::ShowStory() {
+	m_story->Show(true);
+	m_hbox2->Layout();
+	m_vbox->Layout();
+}
+
+void MyFrame::HideStory() {
+	m_story->Show(false);
+	m_hbox2->Layout();
+	m_vbox->Layout();
+}
+
 void MyFrame::OnShowStory(wxCommandEvent& WXUNUSED(event)) {
 	static bool on = false;
 	on ? m_story->Show(false) : m_story->Show(true);
 	on = !on;
 
 	m_hbox2->Layout();
+	m_vbox->Layout();
+}
+
+void MyFrame::ShowAnswer() {
+	m_hbox->Show(true);
+	m_keyword->Show(true);
+	m_hbox->Layout();
+	m_vbox->Layout();
+}
+
+void MyFrame::HideAnswer() {
+	m_hbox->Show(false);
+	m_keyword->Show(false);
+	m_hbox->Layout();
 	m_vbox->Layout();
 }
 
