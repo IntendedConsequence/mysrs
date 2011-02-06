@@ -6,11 +6,13 @@
 #include "wx/dir.h"
 #include "wx/textfile.h"
 
+#include "mysrs.h"
 
 
 
-MyFrame::MyFrame(const wxString& title)
-: wxFrame(NULL, wxID_ANY, title)
+
+MyFrame::MyFrame(const wxString& title, MySRS *app)
+: wxFrame(NULL, wxID_ANY, title), m_app(app)
 {
 	wchar_t buffer[512];
 	GetModuleFileName(NULL, buffer, 512);
@@ -163,7 +165,8 @@ void MyFrame::LoadRepsTodo() {
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
 	//dump all done reps
-	wxFile file;
+
+	/*wxFile file;
 	file.Open(m_output_file, wxFile::read_write);
 	file.SeekEnd();
 	wxString line;
@@ -176,18 +179,19 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 		file.Write(line);
 		m_reps_done.pop();
 	}
-	file.Close();
+	file.Close();*/
+	m_app->DumpDoneReps(m_output_file, m_reps_done);
 
-
-	Card *c = NULL;
-	file.Create(m_input_file, true); //then dump all todo reps
-	while(m_reps_todo.size() > 0) {
-		c = m_reps_todo.front();
-		line = c->GetId() + t + c->GetKanji() + t + c->GetKeyword() + t + c->GetStory() + n;
-		file.Write(line);
-		m_reps_todo.pop();
-	}
-	file.Close();
+	m_app->DumpTodoReps(m_input_file, m_reps_todo);
+	//Card *c = NULL;
+	//file.Create(m_input_file, true); //then dump all todo reps
+	//while(m_reps_todo.size() > 0) {
+	//	c = m_reps_todo.front();
+	//	line = c->GetId() + t + c->GetKanji() + t + c->GetKeyword() + t + c->GetStory() + n;
+	//	file.Write(line);
+	//	m_reps_todo.pop();
+	//}
+	//file.Close();
 
 	Close(true);
 }

@@ -13,12 +13,14 @@ struct answer_result {
 	wxString ease;
 };
 
+class MySRS;
+
 // Define a new frame type: this is going to be our main frame
 class MyFrame : public wxFrame
 {
 public:
 	// ctor(s)
-	MyFrame(const wxString& title);
+	MyFrame(const wxString& title, MySRS *app);
 	virtual ~MyFrame() {
 		for(int i = 0; i < m_cards.size(); i++) {
 			delete m_cards[i];
@@ -41,6 +43,7 @@ public:
 	void AnswerCard(int ease);
 
 private:
+	MySRS *m_app;
 	std::vector<Card *> m_cards;
 
 	wxString m_input_file; //reps todo
