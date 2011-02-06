@@ -22,5 +22,6 @@ deck.checkDailyStats()
 deck.fillQueues()
 deck.updateNewCountToday()
 
-deck.save()
+#we don't need to save anything
+#deck.save()
 deck.close()
