@@ -10,9 +10,9 @@ bool MySRS::OnInit()
 	if ( !wxApp::OnInit() )
 		return false;
 
-	MyFrame *frame = new MyFrame(wxS("mysrs"), this);
+	m_frame = new MyFrame(wxS("mysrs"), this);
 
-	frame->Show(true);
+	m_frame->Show(true);
 
 	return true;
 }
@@ -53,6 +53,46 @@ void MySRS::DumpTodoReps(wxString &filepath, std::queue<Card *> &reps) {
 	file.Close();
 }
 
+void MySRS::AnswerCard(std::queue<Card *> &repstodo, std::queue<answer_result> &repsdone, int ease) {
+	wxString txt;
+	switch(ease) {
+	case 1:
+		txt = wxS("1");
+		break;
+	case 2:
+		txt = wxS("2");
+		break;
+	case 3:
+		txt = wxS("3");
+		break;	
+	case 4:
+		txt = wxS("4");
+		break;
+	}
+
+	Card *c = repstodo.front();
+	repstodo.pop();
+	c->SetEase(txt);
+
+
+	answer_result res;
+	res.id = c->GetId();
+	res.ease = txt;
+	repsdone.push(res);
+
+
+	if(ease == 1) {
+		repstodo.push(c);
+	}
+	if(repstodo.size() > 0) {
+		c = repstodo.front();
+		m_frame->SetCurrentKanji(c->GetKanji(), c->GetStory(), c->GetKeyword());
+	} else {
+		m_frame->SetCurrentKanji(wxS("x"),
+			wxS("you have finished reviewing all cards!"),
+			wxS("no more cards to review"));
+	}
+}
 
 
 

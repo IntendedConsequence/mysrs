@@ -12,6 +12,9 @@ public:
 
 	void DumpDoneReps(wxString &filepath, std::queue<answer_result> &reps);
 	void DumpTodoReps(wxString &filepath, std::queue<Card *> &reps);
+	void AnswerCard(std::queue<Card *> &repstodo, std::queue<answer_result> &repsdone, int ease);
+private:
+	MyFrame *m_frame;
 };
 
 #endif // mysrs_h__

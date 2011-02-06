@@ -227,7 +227,7 @@ void MyFrame::OnShowAnswer(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void MyFrame::AnswerCard(int ease) {
-	wxString txt;
+	/*wxString txt;
 	switch(ease) {
 	case 1:
 		txt = wxS("1");
@@ -264,7 +264,9 @@ void MyFrame::AnswerCard(int ease) {
 		SetCurrentKanji(wxS("x"),
 						wxS("you have finished reviewing all cards!"),
 						wxS("no more cards to review"));
-	}
+	}*/
+
+	m_app->AnswerCard(m_reps_todo, m_reps_done, ease);
 
 	if(m_story->IsShown()) {
 		OnShowStory(wxCommandEvent());
