@@ -16,6 +16,7 @@ for line in open('repsdone.txt'):
     card = deck.cardFromId(int(splt[0]))
     ease = int(splt[1])
     deck._answerCard(card, ease)
+    deck.fillQueues()
 
 deck.checkDailyStats()
 deck.fillQueues()
