@@ -2,6 +2,7 @@
 #define MyFrame_h__
 
 #include "wx/wx.h"
+#include "wx/notebook.h"
 
 #include <vector>
 #include <queue>
@@ -49,6 +50,11 @@ private:
 	wxBoxSizer *m_hbox;
 	wxBoxSizer *m_hbox2;
 	wxPanel *m_panel;
+	wxPanel *m_panelStory1;
+	wxPanel *m_panelStory2;
+	wxStaticText *m_story1;
+	wxStaticText *m_story2;
+	wxNotebook *m_notebook;
 };
 
 #endif // MyFrame_h__

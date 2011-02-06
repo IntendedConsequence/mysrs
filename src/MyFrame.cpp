@@ -19,9 +19,18 @@ MyFrame::MyFrame(const wxString& title, MySRS *app)
 	//m_app->LoadRepsTodo(m_input_file, m_cards, m_reps_todo);
 
 
+	m_notebook = new wxNotebook(this, wxID_ANY);
+
+	m_panel = new wxPanel(m_notebook, wxID_ANY);
+	m_notebook->AddPage(m_panel, wxS("kanji"));
+
+	m_panelStory1 = new wxPanel(m_notebook, wxID_ANY);
+	m_story1 = new wxStaticText(m_panelStory1, wxID_ANY, wxS("Story!"));
+
+	m_notebook->AddPage(m_panelStory1, wxS("story 1"));
+	m_notebook->AddPage(new wxPanel(m_notebook, wxID_ANY), wxS("story 2"));
 
 
-	m_panel = new wxPanel(this);
 	m_vbox = new wxBoxSizer(wxVERTICAL);
 
 	//this is a trick to make menu events handling work
@@ -38,6 +47,7 @@ MyFrame::MyFrame(const wxString& title, MySRS *app)
 
 	wxWindowID show_story_button_id = wxNewId();
 	wxButton *button_show_story = new wxButton(m_panel, show_story_button_id, _T("Show Story"));
+	button_show_story->Show(false); //we use tabs, don't show this button
 	Connect(show_story_button_id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnShowStory));
 	wxWindowID show_answer_button_id = wxNewId();
 	wxButton *button_show_answer = new wxButton(m_panel, show_answer_button_id, _T("Show Answer"));
@@ -148,7 +158,7 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 }
 
 void MyFrame::ShowStory() {
-	m_story->Show(true);
+	//m_story->Show(true); //we use tabs, so don't show story no more
 	m_hbox2->Layout();
 	m_vbox->Layout();
 }
@@ -215,5 +225,9 @@ void MyFrame::OnEasy(wxCommandEvent& WXUNUSED(event)) {
 void MyFrame::SetCurrentKanji(wxString kanji, wxString story, wxString keyword) {
 	m_kanji->SetLabel(kanji);
 	m_story->SetLabel(story);
+	m_story1->SetLabel(story);
+	int w;
+	m_panelStory1->GetSize(&w, NULL);
+	m_story1->Wrap(w);
 	m_keyword->SetLabel(keyword);
 }
