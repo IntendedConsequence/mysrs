@@ -1,6 +1,6 @@
 #include "MyFrame.h"
 
-#include "Winbase.h"
+//#include "Winbase.h"
 
 
 #include "wx/dir.h"
@@ -14,15 +14,9 @@
 MyFrame::MyFrame(const wxString& title, MySRS *app)
 : wxFrame(NULL, wxID_ANY, title), m_app(app)
 {
-	wchar_t buffer[512];
-	GetModuleFileName(NULL, buffer, 512);
-	wxString path(buffer);
-	path = path.BeforeLast('\\');
-
-	m_input_file = path + wxS("\\repstodo.txt");
-	m_output_file = path + wxS("\\repsdone.txt");
-
-	LoadRepsTodo();
+	
+	//LoadRepsTodo();
+	//m_app->LoadRepsTodo(m_input_file, m_cards, m_reps_todo);
 
 
 
@@ -74,11 +68,11 @@ MyFrame::MyFrame(const wxString& title, MySRS *app)
 	wxWindowID story_id = wxNewId();
 
 
-	m_kanji = new wxStaticText(m_panel, kanji_id, m_cards[0]->GetKanji());
-	m_keyword = new wxStaticText(m_panel, wxID_ANY, m_cards[0]->GetKeyword());
+	m_kanji = new wxStaticText(m_panel, kanji_id, wxS("0"));
+	m_keyword = new wxStaticText(m_panel, wxID_ANY, wxS("zero"));
 	m_keyword->Show(false);
 	//story = new wxTextCtrl(panel, story_id, _T("\"The Pinnacle, to me, is a city that makes itself out to be perfect but is filled with dirty secrets that photographers are always trying to reveal (see dissolve (#1044) The city's councilmen have isolated all professional photographers to make sure they don't photograph these \"\"dirty secrets\"\". (which are up to your imagination).\""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-	m_story = new wxTextCtrl(m_panel, story_id, m_cards[0]->GetStory(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+	m_story = new wxTextCtrl(m_panel, story_id, wxS("you shouldn't see this!"), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 	m_story->Show(false);
 	//story->Wrap(100);
 	//vbox->Add(button_exit, 0, wxALIGN_LEFT | wxALIGN_TOP);
@@ -130,68 +124,13 @@ MyFrame::MyFrame(const wxString& title, MySRS *app)
 
 }
 
-void MyFrame::LoadRepsTodo() {
-	wxTextFile file(m_input_file);
-	wxString s;
-	wxString _id, _kanji, _keyword, _story;
-	if(file.Exists()) {	
-		file.Open();
-
-		for(s = file.GetFirstLine(); !file.Eof(); s = file.GetNextLine()) {
-			_id = s.BeforeFirst('\t');
-			s = s.AfterFirst('\t');
-			_kanji = s.BeforeFirst('\t');
-			s = s.AfterFirst('\t');
-			_keyword = s.BeforeFirst('\t');
-			s = s.AfterFirst('\t');
-			_story = s;
-
-			Card *c = new Card(_id, _kanji, _keyword, _story);
-			m_cards.push_back(c);
-			m_reps_todo.push(c);
-		}
-
-		file.Close();
-	}
-
-	if(m_cards.size() == 0) {
-		m_cards.push_back(new Card(L"0", L"x", L"there is nothing to review!", L"the repstodo.txt file is empty"));
-	}
-}
-
 
 // event handlers
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
-	//dump all done reps
-
-	/*wxFile file;
-	file.Open(m_output_file, wxFile::read_write);
-	file.SeekEnd();
-	wxString line;
-	wxString t = wxS('\t');
-	wxString n = wxS('\n');
-	answer_result r;
-	while(m_reps_done.size() > 0) {
-		r = m_reps_done.front();
-		line = r.id + t + r.ease + n;
-		file.Write(line);
-		m_reps_done.pop();
-	}
-	file.Close();*/
-	m_app->DumpDoneReps(m_output_file, m_reps_done);
-
-	m_app->DumpTodoReps(m_input_file, m_reps_todo);
-	//Card *c = NULL;
-	//file.Create(m_input_file, true); //then dump all todo reps
-	//while(m_reps_todo.size() > 0) {
-	//	c = m_reps_todo.front();
-	//	line = c->GetId() + t + c->GetKanji() + t + c->GetKeyword() + t + c->GetStory() + n;
-	//	file.Write(line);
-	//	m_reps_todo.pop();
-	//}
-	//file.Close();
+	m_app->DumpDoneReps();
+	m_app->DumpTodoReps();
 
 	Close(true);
 }
@@ -221,12 +160,11 @@ void MyFrame::HideStory() {
 }
 
 void MyFrame::OnShowStory(wxCommandEvent& WXUNUSED(event)) {
-	static bool on = false;
-	on ? m_story->Show(false) : m_story->Show(true);
-	on = !on;
-
-	m_hbox2->Layout();
-	m_vbox->Layout();
+	if(m_story->IsShown()) {
+		HideStory();
+	} else {
+		ShowStory();
+	}
 }
 
 void MyFrame::ShowAnswer() {
@@ -244,62 +182,18 @@ void MyFrame::HideAnswer() {
 }
 
 void MyFrame::OnShowAnswer(wxCommandEvent& WXUNUSED(event)) {
-	static bool ison = false;
-	m_hbox->Show(!ison);
-	m_keyword->Show(!ison);
-	ison = !ison;
-	m_hbox->Layout();
-	m_vbox->Layout();
+	if(m_keyword->IsShown()) {
+		HideAnswer();
+	} else {
+		ShowAnswer();
+	}
 }
 
 void MyFrame::AnswerCard(int ease) {
-	/*wxString txt;
-	switch(ease) {
-	case 1:
-		txt = wxS("1");
-		break;
-	case 2:
-		txt = wxS("2");
-		break;
-	case 3:
-		txt = wxS("3");
-		break;	
-	case 4:
-		txt = wxS("4");
-		break;
-	}
+	m_app->AnswerCard(ease);
 
-	Card *c;
-	c = m_reps_todo.front();
-	m_reps_todo.pop();
-
-	c->SetEase(txt);
-
-	answer_result res;
-	res.id = c->GetId();
-	res.ease = txt;
-	m_reps_done.push(res);
-
-	if(ease == 1) {
-		m_reps_todo.push(c);
-	}
-	if(m_reps_todo.size() > 0) {
-		c = m_reps_todo.front();
-		SetCurrentKanji(c->GetKanji(), c->GetStory(), c->GetKeyword());
-	} else {
-		SetCurrentKanji(wxS("x"),
-						wxS("you have finished reviewing all cards!"),
-						wxS("no more cards to review"));
-	}*/
-
-	m_app->AnswerCard(m_reps_todo, m_reps_done, ease);
-
-	if(m_story->IsShown()) {
-		OnShowStory(wxCommandEvent());
-	}
-
-
-	OnShowAnswer(wxCommandEvent());
+	HideStory();
+	HideAnswer();
 }
 
 void MyFrame::OnFail(wxCommandEvent& WXUNUSED(event)) {

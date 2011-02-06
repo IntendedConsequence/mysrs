@@ -21,15 +21,7 @@ class MyFrame : public wxFrame
 public:
 	// ctor(s)
 	MyFrame(const wxString& title, MySRS *app);
-	virtual ~MyFrame() {
-		for(int i = 0; i < m_cards.size(); i++) {
-			delete m_cards[i];
-		}
-		m_cards.clear();
 
-	}
-
-	void LoadRepsTodo();
 	void SetCurrentKanji(wxString kanji, wxString story, wxString keyword);
 
 	void ShowStory();
@@ -49,13 +41,6 @@ public:
 
 private:
 	MySRS *m_app;
-	std::vector<Card *> m_cards;
-
-	wxString m_input_file; //reps todo
-	wxString m_output_file; //reps done
-
-	std::queue<Card *> m_reps_todo;
-	std::queue<answer_result> m_reps_done;
 
 	wxStaticText *m_kanji;
 	wxStaticText *m_keyword;
