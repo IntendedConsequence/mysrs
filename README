@@ -1,0 +1,55 @@
+This is a little app for Windows Mobile to help me learn kanji. It is
+not a standalone srs software, not by a long shot. It is only a
+supplement to desktop Anki. It uses 2 python scripts to export and
+import data to Anki.
+
+You (obviously) need python. I used python27, didn't test the others.
+You need to edit the python scripts and replace the anki deck name.
+Maybe I will add a gui later... It's fine the way it is though.
+
+Basically it goes like this:
+1) export due reps and new cards (fromanki.py)
+2) do reps on Windows Mobile device (mysrs.exe)
+ * optionally learn new cards
+3) import answer data to Anki (toanki.py)
+
+All of this is based on my Anki setup. It's called Lazy Kanji Mod. In a
+nutshell, it is based on the RTK (remembering the kanji) by Heisig.
+You are shown a kanji, and you need to remember the keyword. You can
+read 2 stories as hints. My anki deck has top 2 stories for every kanji
+from the RevTK website (reviewing the kanji). It is a shared deck,
+everyone can download it. However there is one little modification I had
+to do: replace all mentions of keywords in the stories with _______.
+
+repsnew.txt holds new cards
+repstodo.txt holds due cards
+repsdone.txt holds done reps
+
+python scripts use official libanki
+
+mysrs app uses wxWidgets for WinCE
+
+I have compiled wxWidgets 2.8.something with vs2008 both debug and
+release, static libs.
+
+A little history. I have a Windows Mobile device that doesn't have an
+internet connection. I wanted to have the possibility of doing reps
+wherever I go, when I have a minute or something. It adds up, I didn't
+really do anything, and by the end of the day I did a couple of hundreds
+of reps. Priceless, compared to the usual desktop approach of doing all
+in one go. Or not doing =) Anyway, I searched the net for a ready app,
+but all I could find is ankimini, which despite following the
+instructions and downloading a package made specifically to work with
+WinCE I couldn't make to work. The reason was IE Mobile can't access
+localhost or 127.0.0.1 without a working internet connection. I tried
+zillion of fixes and browsers neither of which worked. So I decided to
+write my own app. And I did.
+The app is made specifically for my needs. I doubt that that a lot of
+people would want to use it, since my constraints and my kanji learning
+setup are kind of rare.
+However I do think that there are probably a couple of folks that could
+use this, and this is why I decided to make a public repo so everyone
+can download, use, tweak, maybe even improve it.
+
+Even if there is just one person that finds this useful, it was still
+worth the trouble of releasing it =)
